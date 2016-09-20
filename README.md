@@ -30,7 +30,7 @@ docker run \
   -v `pwd`:/my-protos \
   -w /my-protos \
   -u `id -u $USER`:`id -g $USER`
-  --rm -it protobuf-tools:latest protoc --doc_out=html,index.html:doc *.proto
+  --rm -it brennovich/protobuf-tools:latest protoc --doc_out=html,index.html:doc *.proto
 ```
 
 Let's take a close look, step-by-step:
@@ -39,7 +39,7 @@ Let's take a close look, step-by-step:
 2. `-w /my-protos`: set `/my-protos` as working directory, where your command will run;
 3. ```-u `id -u $USER`:`id -g $USER````: ensures any manipulation of files to be done as a copy-cat of the
   host user, so we can't end up with undesired permissions;
-4. `--rm -it protobuf-tools:latest`: executes the given command in a container that will be removed
+4. `--rm -it brennovich/protobuf-tools:latest`: executes the given command in a container that will be removed
   immediately after the execution;
 5. `protoc --doc_out=html,index.html:doc *.proto`: this command build docs in HTML format inside
   `~/my-protos/doc` for all `.proto` files.
