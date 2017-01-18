@@ -14,7 +14,7 @@ RUN apk add --update \
 
 # Build protobuf against configured revision
 #
-ENV PROTOBUF_REVISION v3.0.2
+ENV PROTOBUF_REVISION v3.1.0
 RUN git clone https://github.com/google/protobuf -b $PROTOBUF_REVISION --depth 1 \
   && cd protobuf \
   && ./autogen.sh \
@@ -43,7 +43,7 @@ RUN git clone https://github.com/estan/protoc-gen-doc.git \
 #
 # Important: Java is a dependency!
 #
-ENV SCALA_PB_VERSION 0.5.43
+ENV SCALA_PB_VERSION 0.5.47
 RUN curl -sLO "https://github.com/trueaccord/ScalaPB/releases/download/v$SCALA_PB_VERSION/scalapbc-$SCALA_PB_VERSION.zip" \
   && unzip "scalapbc-$SCALA_PB_VERSION.zip" \
   && mv "scalapbc-$SCALA_PB_VERSION" /usr/local/lib/scalapbc \
