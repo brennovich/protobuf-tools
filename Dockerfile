@@ -1,7 +1,7 @@
-FROM alpine:3.4
+FROM alpine:3.6
 MAINTAINER brennolncosta@gmail.com
 
-ARG BUILD_CORES=1
+ARG JOBS=1
 
 RUN apk add --update \
       autoconf \
@@ -9,27 +9,35 @@ RUN apk add --update \
       build-base\
       curl \
       git \
+      go \
       libtool \
+      protobuf \
       qt5-qtbase-dev
 
 # Build protobuf against configured revision
 #
-ENV PROTOBUF_REVISION v3.1.0
+ENV PROTOBUF_REVISION v3.3.1
 RUN git clone https://github.com/google/protobuf -b $PROTOBUF_REVISION --depth 1 \
   && cd protobuf \
   && ./autogen.sh \
   && ./configure --prefix=/usr \
-  && make -j $BUILD_CORES \
+  && make -j $JOBS \
   && make check \
   && make install \
   && cd .. && rm -rf protobuf && cd
+
+# Install [protoc-gen-go](https://github.com/protobuf/protoc-gen-go)
+ENV GOPATH /go
+ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
+RUN mkdir /go \
+  && go get -u github.com/golang/protobuf/protoc-gen-go
 
 # Build [protoc-gen-doc](https://github.com/estan/protoc-gen-doc) against configured revision
 #
 # protobuf plugin to generate docs in markdown, html, docbook and pdf
 #
-ENV PROTOC_GEN_DOC_REVISION 225664a903cebe0823669bdc5ea97ea9cbd80989
-RUN git clone https://github.com/estan/protoc-gen-doc.git \
+ENV PROTOC_GEN_DOC_REVISION 83b0febd4be32cde2579cd7bee9729ef233829f7
+RUN git clone https://github.com/pseudomuto/protoc-gen-doc.git \
   && cd protoc-gen-doc \
   && git checkout $PROTOC_GEN_DOC_REVISION \
   && /usr/lib/qt5/bin/qmake \
@@ -79,13 +87,14 @@ RUN ALPINE_GLIBC_BASE_URL="https://github.com/andyshinn/alpine-pkg-glibc/release
         "$ALPINE_GLIBC_I18N_PACKAGE_FILENAME"
 
 ENV JAVA_VERSION=8 \
-    JAVA_UPDATE=112 \
-    JAVA_BUILD=15 \
+    JAVA_UPDATE=131 \
+    JAVA_BUILD=11 \
+    ORACLE_TOKEN=d54c1d3a095b4ff2b6607d096fa80163 \
     JAVA_HOME="/opt/jdk"
 
 RUN apk add --no-cache --virtual=java-dependencies ca-certificates \
     && cd "/tmp" \
-    && curl -sL --header "Cookie: oraclelicense=accept-securebackup-cookie;" -O "http://download.oracle.com/otn-pub/java/jdk/${JAVA_VERSION}u${JAVA_UPDATE}-b${JAVA_BUILD}/jdk-${JAVA_VERSION}u${JAVA_UPDATE}-linux-x64.tar.gz" \
+    && curl -sL --header "Cookie: oraclelicense=accept-securebackup-cookie;" -O "http://download.oracle.com/otn-pub/java/jdk/${JAVA_VERSION}u${JAVA_UPDATE}-b${JAVA_BUILD}/${ORACLE_TOKEN}/jdk-${JAVA_VERSION}u${JAVA_UPDATE}-linux-x64.tar.gz" \
     && tar -xzvf "jdk-${JAVA_VERSION}u${JAVA_UPDATE}-linux-x64.tar.gz"  \
     && mkdir -p $JAVA_HOME \
     && mv jdk1*/* $JAVA_HOME \
