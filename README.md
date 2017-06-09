@@ -19,8 +19,9 @@ from `proto`s.
 This image gives you a compiled protobuf and some of its plugins (not so many for now):
 
 - `protobuf3`: https://github.com/google/protobuf
-- `protoc-gen-doc`: https://github.com/estan/protoc-gen-doc
+- `protoc-gen-doc`: https://github.com/pseudomuto/protoc-gen-doc
 - `protoc-gen-scala`: https://github.com/scalapb/ScalaPB
+- `protoc-gen-go`: https://github.com/golang/protobuf
 
 ## Usage
 
