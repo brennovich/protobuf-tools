@@ -26,37 +26,6 @@ RUN git clone https://github.com/google/protobuf -b $PROTOBUF_REVISION --depth 1
   && make install \
   && cd .. && rm -rf protobuf && cd
 
-# Install [protoc-gen-go](https://github.com/protobuf/protoc-gen-go)
-ENV GOPATH /go
-ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
-RUN mkdir /go \
-  && go get -u github.com/golang/protobuf/protoc-gen-go
-
-# Build [protoc-gen-doc](https://github.com/estan/protoc-gen-doc) against configured revision
-#
-# protobuf plugin to generate docs in markdown, html, docbook and pdf
-#
-ENV PROTOC_GEN_DOC_REVISION 83b0febd4be32cde2579cd7bee9729ef233829f7
-RUN git clone https://github.com/pseudomuto/protoc-gen-doc.git \
-  && cd protoc-gen-doc \
-  && git checkout $PROTOC_GEN_DOC_REVISION \
-  && /usr/lib/qt5/bin/qmake \
-  && make \
-  && cp protoc-gen-doc /usr/local/bin \
-  && cd .. && rm -rf protoc-gen-doc && cd
-
-# Build [ScalaPB](https://github.com/trueaccord/ScalaPB) plugin
-#
-# This plugin make possible to generate Scala's case class for a given proto.
-#
-# Important: Java is a dependency!
-#
-ENV SCALA_PB_VERSION 0.5.47
-RUN curl -sLO "https://github.com/trueaccord/ScalaPB/releases/download/v$SCALA_PB_VERSION/scalapbc-$SCALA_PB_VERSION.zip" \
-  && unzip "scalapbc-$SCALA_PB_VERSION.zip" \
-  && mv "scalapbc-$SCALA_PB_VERSION" /usr/local/lib/scalapbc \
-  && ln -s /usr/local/lib/scalapbc/bin/scalapbc /usr/local/bin/scalapbc
-
 ENV LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 LANGUAGE=en_US.UTF-8
 RUN ALPINE_GLIBC_BASE_URL="https://github.com/andyshinn/alpine-pkg-glibc/releases/download" \
     && ALPINE_GLIBC_PACKAGE_VERSION="2.23-r1" \
@@ -122,6 +91,38 @@ RUN apk add --no-cache --virtual=java-dependencies ca-certificates \
       $JAVA_HOME/jre/lib/amd64/libjfx*.so \
     && apk del java-dependencies \
     && rm -rf "/tmp/"*
+
+# Build [protoc-gen-doc](https://github.com/estan/protoc-gen-doc) against configured revision
+#
+# protobuf plugin to generate docs in markdown, html, docbook and pdf
+#
+ENV PROTOC_GEN_DOC_REVISION 83b0febd4be32cde2579cd7bee9729ef233829f7
+RUN git clone https://github.com/pseudomuto/protoc-gen-doc.git \
+  && cd protoc-gen-doc \
+  && git checkout $PROTOC_GEN_DOC_REVISION \
+  && /usr/lib/qt5/bin/qmake \
+  && make \
+  && cp protoc-gen-doc /usr/local/bin \
+  && cd .. && rm -rf protoc-gen-doc && cd
+
+# Build [ScalaPB](https://github.com/trueaccord/ScalaPB) plugin
+#
+# This plugin make possible to generate Scala's case class for a given proto.
+#
+# Important: Java is a dependency!
+#
+ENV SCALA_PB_VERSION 0.5.47
+RUN curl -sLO "https://github.com/trueaccord/ScalaPB/releases/download/v$SCALA_PB_VERSION/scalapbc-$SCALA_PB_VERSION.zip" \
+  && unzip "scalapbc-$SCALA_PB_VERSION.zip" \
+  && mv "scalapbc-$SCALA_PB_VERSION" /usr/local/lib/scalapbc \
+  && ln -s /usr/local/lib/scalapbc/bin/scalapbc /usr/local/bin/scalapbc
+
+# Install [protoc-gen-go](https://github.com/protobuf/protoc-gen-go)
+ENV GOPATH /go
+ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
+RUN mkdir /go \
+  && go get -u github.com/golang/protobuf/protoc-gen-go \
+  && go get -u github.com/square/goprotowrap/cmd/protowrap
 
 # Needed shared libraries and tools by protobuf and their plugins
 RUN apk --update add \
