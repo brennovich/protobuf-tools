@@ -111,7 +111,7 @@ RUN git clone https://github.com/pseudomuto/protoc-gen-doc.git \
 #
 # Important: Java is a dependency!
 #
-ENV SCALA_PB_VERSION 0.5.47
+ENV SCALA_PB_VERSION 0.6.3
 RUN curl -sLO "https://github.com/trueaccord/ScalaPB/releases/download/v$SCALA_PB_VERSION/scalapbc-$SCALA_PB_VERSION.zip" \
   && unzip "scalapbc-$SCALA_PB_VERSION.zip" \
   && mv "scalapbc-$SCALA_PB_VERSION" /usr/local/lib/scalapbc \
