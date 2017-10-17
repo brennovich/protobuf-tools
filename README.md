@@ -23,6 +23,7 @@ This image gives you a compiled protobuf and some of its plugins (not so many fo
 - `protoc-gen-scala`: https://github.com/scalapb/ScalaPB
 - `protoc-gen-go`: https://github.com/golang/protobuf
 - `goprotowrap`: https://github.com/square/goprotowrap
+- `rust-protobuf`: https://github.com/stepancheg/rust-protobuf
 
 ## Usage
 
