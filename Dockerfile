@@ -11,20 +11,14 @@ RUN apk add --update \
       git \
       go \
       libtool \
-      protobuf \
-      qt5-qtbase-dev
+      unzip
 
 # Build protobuf against configured revision
 #
-ENV PROTOBUF_REVISION v3.3.1
-RUN git clone https://github.com/google/protobuf -b $PROTOBUF_REVISION --depth 1 \
-  && cd protobuf \
-  && ./autogen.sh \
-  && ./configure --prefix=/usr \
-  && make -j $JOBS \
-  && make check \
-  && make install \
-  && cd .. && rm -rf protobuf && cd
+ENV PROTOBUF_REVISION 3.5.0
+RUN curl -sLO https://github.com/google/protobuf/releases/download/v${PROTOBUF_REVISION}/protoc-${PROTOBUF_REVISION}-linux-x86_64.zip \
+  && unzip protoc-${PROTOBUF_REVISION}-linux-x86_64.zip -d ./usr/local \
+  && rm protoc-${PROTOBUF_REVISION}-linux-x86_64.zip
 
 ENV LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 LANGUAGE=en_US.UTF-8
 RUN ALPINE_GLIBC_BASE_URL="https://github.com/andyshinn/alpine-pkg-glibc/releases/download" \
@@ -96,14 +90,11 @@ RUN apk add --no-cache --virtual=java-dependencies ca-certificates \
 #
 # protobuf plugin to generate docs in markdown, html, docbook and pdf
 #
-ENV PROTOC_GEN_DOC_REVISION 69b23e9bcd408c4f686007c7d3c78e2d12542e48
-RUN git clone https://github.com/pseudomuto/protoc-gen-doc.git \
-  && cd protoc-gen-doc \
-  && git checkout $PROTOC_GEN_DOC_REVISION \
-  && /usr/lib/qt5/bin/qmake \
-  && make \
-  && cp protoc-gen-doc /usr/local/bin \
-  && cd .. && rm -rf protoc-gen-doc && cd
+ENV PROTOC_GEN_DOC_REVISION 1.0.0
+RUN curl -sLO https://github.com/pseudomuto/protoc-gen-doc/releases/download/v${PROTOC_GEN_DOC_REVISION}/protoc-gen-doc-${PROTOC_GEN_DOC_REVISION}.linux-amd64.go1.9.tar.gz \
+  && tar -zxvf protoc-gen-doc-${PROTOC_GEN_DOC_REVISION}.linux-amd64.go1.9.tar.gz \
+  && cp protoc-gen-doc-${PROTOC_GEN_DOC_REVISION}.linux-amd64.go1.9/protoc-gen-doc /usr/local/bin/ \
+  && rm -rf protoc-gen-doc-*
 
 # Build [ScalaPB](https://github.com/trueaccord/ScalaPB) plugin
 #
@@ -111,7 +102,7 @@ RUN git clone https://github.com/pseudomuto/protoc-gen-doc.git \
 #
 # Important: Java is a dependency!
 #
-ENV SCALA_PB_VERSION 0.6.3
+ENV SCALA_PB_VERSION 0.6.6
 RUN curl -sLO "https://github.com/trueaccord/ScalaPB/releases/download/v$SCALA_PB_VERSION/scalapbc-$SCALA_PB_VERSION.zip" \
   && unzip "scalapbc-$SCALA_PB_VERSION.zip" \
   && mv "scalapbc-$SCALA_PB_VERSION" /usr/local/lib/scalapbc \
@@ -127,13 +118,14 @@ RUN mkdir /go \
 # Needed shared libraries and tools by protobuf and their plugins
 RUN apk --update add \
   bash \
-  libstdc++ \
-  qt5-qtbase
+  libstdc++
 
 # Install  [rust-protobuf](https://github.com/stepancheg/rust-protobuf) plugin
 ENV RUST_PROTOBUF_VERSION 1.4.2
 ENV RUSTPATH /rust
-RUN apk add cargo && mkdir $RUSTPATH && cargo install --root $RUSTPATH --vers $RUST_PROTOBUF_VERSION protobuf
+RUN apk add cargo \
+  && mkdir $RUSTPATH \
+  && cargo install --root $RUSTPATH --vers $RUST_PROTOBUF_VERSION protobuf
 ENV PATH $RUSTPATH/bin:$PATH
 
 # Cleaning up
@@ -144,6 +136,6 @@ RUN apk del \
   curl \
   git \
   libtool \
-  qt5-qtbase-dev \
+  unzip \
   && rm -rf /var/cache/apk/*
 
