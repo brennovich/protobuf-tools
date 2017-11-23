@@ -96,7 +96,7 @@ RUN apk add --no-cache --virtual=java-dependencies ca-certificates \
 #
 # protobuf plugin to generate docs in markdown, html, docbook and pdf
 #
-ENV PROTOC_GEN_DOC_REVISION 83b0febd4be32cde2579cd7bee9729ef233829f7
+ENV PROTOC_GEN_DOC_REVISION 69b23e9bcd408c4f686007c7d3c78e2d12542e48
 RUN git clone https://github.com/pseudomuto/protoc-gen-doc.git \
   && cd protoc-gen-doc \
   && git checkout $PROTOC_GEN_DOC_REVISION \
