@@ -1,4 +1,4 @@
-FROM alpine:3.6
+FROM alpine:3.8
 MAINTAINER brennolncosta@gmail.com
 
 RUN apk add --update \
@@ -120,11 +120,11 @@ RUN apk --update add \
   libstdc++
 
 # Install  [rust-protobuf](https://github.com/stepancheg/rust-protobuf) plugin
-ENV RUST_PROTOBUF_VERSION 1.4.2
+ENV RUST_PROTOBUF_VERSION 2.0.2
 ENV RUSTPATH /rust
-RUN apk add cargo \
+RUN apk add cargo>1.26.0 \
   && mkdir $RUSTPATH \
-  && cargo install --root $RUSTPATH --vers $RUST_PROTOBUF_VERSION protobuf
+  && cargo install --all-features --root $RUSTPATH --vers $RUST_PROTOBUF_VERSION protobuf-codegen
 ENV PATH $RUSTPATH/bin:$PATH
 
 # Cleaning up
