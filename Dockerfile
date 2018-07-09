@@ -17,6 +17,8 @@ ENV PROTOBUF_REVISION 3.5.0
 RUN curl -sLO https://github.com/google/protobuf/releases/download/v${PROTOBUF_REVISION}/protoc-${PROTOBUF_REVISION}-linux-x86_64.zip \
   && unzip protoc-${PROTOBUF_REVISION}-linux-x86_64.zip -d ./usr/local \
   && chmod +x /usr/local/bin/protoc \
+# Path of wellknown proto files
+  && chmod -R 755 /usr/local/include/ \
   && rm protoc-${PROTOBUF_REVISION}-linux-x86_64.zip
 
 ENV LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 LANGUAGE=en_US.UTF-8
