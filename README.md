@@ -34,25 +34,32 @@ This image gives you a compiled protobuf and some of its plugins (not so many fo
 cd ~/my-protos
 
 docker run \
-  -v `pwd`:/my-protos \
+  --name my-protos
+  -v `pwd`:/my-protos:ro \
   -w /my-protos \
-  -u `id -u $USER`:`id -g $USER`
-  --rm -it brennovich/protobuf-tools:latest protoc --doc_out=html,index.html:doc *.proto
+  --rm -it brennovich/protobuf-tools:latest protoc --doc_out=html,index.html:/build *.proto
+
+# Make sure to use docker cp instead of writing in mounted folder, it avoid permissions issues and is much more flexible
+docker cp my-protos:/build compiled-protos
+docker rm my-protos
 ```
 
-Let's take a close look, step-by-step:
+For more examples compiling for various languages look `[Makefile]
 
-1. ```-v `pwd`:/my-protos```: mounts the current directory into `/my-protos` inside the container;
-2. `-w /my-protos`: set `/my-protos` as working directory, where your command will run;
-3. ```-u `id -u $USER`:`id -g $USER\````: ensures any manipulation of files to be done as a copy-cat of the
-  host user, so we can't end up with undesired permissions;
-4. `--rm -it brennovich/protobuf-tools:latest`: executes the given command in a container that will be removed
-  immediately after the execution;
-5. `protoc --doc_out=html,index.html:doc *.proto`: this command build docs in HTML format inside
-  `~/my-protos/doc` for all `.proto` files.
+## Test, buid & release
+
+All of that can be done using makefile:
+
+```
+make test # this will build a docker image of current HEAD and run plugins and extensions
+make release RELEASE=3.0.0 # build a docker iamge, tag and publish it to brennovich/protobuf-tools docker hub repo
+```
+
+Checkout `[Makefile]` for more tasks ;)
 
 ## Contributing
 
 1. Fork it
 2. Fix, or add your feature in a new branch
 3. Open up a Pull Request against this repo with an useful description
+4. Try to stick with formating conventions already used in the files

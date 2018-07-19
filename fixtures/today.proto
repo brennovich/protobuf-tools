@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package today;
+option go_package = "github.com/brennovich/protobuf-tools/fixtures/today";
+
+import "google/protobuf/timestamp.proto";
+
+message Today {
+  google.protobuf.Timestamp timestamp = 1;
+}
+

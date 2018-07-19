@@ -13,26 +13,23 @@ RUN apk add --update \
 
 # Build protobuf against configured revision
 #
-ENV PROTOBUF_REVISION 3.5.0
+ENV PROTOBUF_REVISION 3.6.0
 RUN curl -sLO https://github.com/google/protobuf/releases/download/v${PROTOBUF_REVISION}/protoc-${PROTOBUF_REVISION}-linux-x86_64.zip \
   && unzip protoc-${PROTOBUF_REVISION}-linux-x86_64.zip -d ./usr/local \
   && chmod +x /usr/local/bin/protoc \
-# Path of wellknown proto files
   && chmod -R 755 /usr/local/include/ \
   && rm protoc-${PROTOBUF_REVISION}-linux-x86_64.zip
 
 ENV LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 LANGUAGE=en_US.UTF-8
 RUN ALPINE_GLIBC_BASE_URL="https://github.com/andyshinn/alpine-pkg-glibc/releases/download" \
-    && ALPINE_GLIBC_PACKAGE_VERSION="2.23-r1" \
+    && ALPINE_GLIBC_PACKAGE_VERSION="2.27-r0" \
     && ALPINE_GLIBC_BASE_PACKAGE_FILENAME="glibc-$ALPINE_GLIBC_PACKAGE_VERSION.apk" \
     && ALPINE_GLIBC_BIN_PACKAGE_FILENAME="glibc-bin-$ALPINE_GLIBC_PACKAGE_VERSION.apk" \
     && ALPINE_GLIBC_I18N_PACKAGE_FILENAME="glibc-i18n-$ALPINE_GLIBC_PACKAGE_VERSION.apk" \
-    && apk --update add bash \
-    && apk add --no-cache --virtual=build-dependencies ca-certificates \
-    && apk add bash \
-    && apk add tzdata \
-    && cp /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime \
-    && echo America/Sao_Paulo > /etc/timezone \
+    && apk add --no-cache --virtual=build-dependencies \
+      ca-certificates \
+      bash \
+      tzdata \
     && curl -sL \
         -O "$ALPINE_GLIBC_BASE_URL/$ALPINE_GLIBC_PACKAGE_VERSION/$ALPINE_GLIBC_BASE_PACKAGE_FILENAME" \
         -O "$ALPINE_GLIBC_BASE_URL/$ALPINE_GLIBC_PACKAGE_VERSION/$ALPINE_GLIBC_BIN_PACKAGE_FILENAME" \
@@ -51,9 +48,9 @@ RUN ALPINE_GLIBC_BASE_URL="https://github.com/andyshinn/alpine-pkg-glibc/release
         "$ALPINE_GLIBC_I18N_PACKAGE_FILENAME"
 
 ENV JAVA_VERSION=8 \
-    JAVA_UPDATE=131 \
-    JAVA_BUILD=11 \
-    ORACLE_TOKEN=d54c1d3a095b4ff2b6607d096fa80163 \
+    JAVA_UPDATE=181 \
+    JAVA_BUILD=13 \
+    ORACLE_TOKEN=96a7b8442fe848ef90c96a2fad6ed6d1 \
     JAVA_HOME="/opt/jdk"
 
 RUN apk add --no-cache --virtual=java-dependencies ca-certificates \
@@ -91,10 +88,10 @@ RUN apk add --no-cache --virtual=java-dependencies ca-certificates \
 #
 # protobuf plugin to generate docs in markdown, html, docbook and pdf
 #
-ENV PROTOC_GEN_DOC_REVISION 1.0.0
-RUN curl -sLO https://github.com/pseudomuto/protoc-gen-doc/releases/download/v${PROTOC_GEN_DOC_REVISION}/protoc-gen-doc-${PROTOC_GEN_DOC_REVISION}.linux-amd64.go1.9.tar.gz \
-  && tar -zxvf protoc-gen-doc-${PROTOC_GEN_DOC_REVISION}.linux-amd64.go1.9.tar.gz \
-  && cp protoc-gen-doc-${PROTOC_GEN_DOC_REVISION}.linux-amd64.go1.9/protoc-gen-doc /usr/local/bin/ \
+ENV PROTOC_GEN_DOC_REVISION 1.1.0
+RUN curl -sLO https://github.com/pseudomuto/protoc-gen-doc/releases/download/v${PROTOC_GEN_DOC_REVISION}/protoc-gen-doc-${PROTOC_GEN_DOC_REVISION}.linux-amd64.go1.10.tar.gz \
+  && tar -zxvf protoc-gen-doc-${PROTOC_GEN_DOC_REVISION}.linux-amd64.go1.10.tar.gz \
+  && cp protoc-gen-doc-${PROTOC_GEN_DOC_REVISION}.linux-amd64.go1.10/protoc-gen-doc /usr/local/bin/ \
   && rm -rf protoc-gen-doc-*
 
 # Build [ScalaPB](https://github.com/trueaccord/ScalaPB) plugin
@@ -103,11 +100,12 @@ RUN curl -sLO https://github.com/pseudomuto/protoc-gen-doc/releases/download/v${
 #
 # Important: Java is a dependency!
 #
-ENV SCALA_PB_VERSION 0.6.6
+ENV SCALA_PB_VERSION 0.7.4
 RUN curl -sLO "https://github.com/trueaccord/ScalaPB/releases/download/v$SCALA_PB_VERSION/scalapbc-$SCALA_PB_VERSION.zip" \
   && unzip "scalapbc-$SCALA_PB_VERSION.zip" \
   && mv "scalapbc-$SCALA_PB_VERSION" /usr/local/lib/scalapbc \
-  && ln -s /usr/local/lib/scalapbc/bin/scalapbc /usr/local/bin/scalapbc
+  && ln -s /usr/local/lib/scalapbc/bin/scalapbc /usr/local/bin/scalapbc \
+  && rm "/scalapbc-$SCALA_PB_VERSION.zip"
 
 # Install [protoc-gen-go](https://github.com/protobuf/protoc-gen-go)
 ENV GOPATH /go
@@ -122,7 +120,7 @@ RUN apk --update add \
   libstdc++
 
 # Install  [rust-protobuf](https://github.com/stepancheg/rust-protobuf) plugin
-ENV RUST_PROTOBUF_VERSION 2.0.2
+ENV RUST_PROTOBUF_VERSION 2.0.3
 ENV RUSTPATH /rust
 RUN apk add cargo>1.26.0 \
   && mkdir $RUSTPATH \
@@ -134,9 +132,11 @@ RUN apk del \
   autoconf \
   automake \
   build-base \
+  cargo \
   curl \
   git \
   libtool \
   unzip \
   && rm -rf /var/cache/apk/*
 
+RUN mkdir /build
