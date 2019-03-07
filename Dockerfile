@@ -1,5 +1,4 @@
-FROM alpine:3.8
-MAINTAINER brennolncosta@gmail.com
+FROM alpine:3.9
 
 RUN apk add --update \
       autoconf \
@@ -13,7 +12,7 @@ RUN apk add --update \
 
 # Build protobuf against configured revision
 #
-ENV PROTOBUF_REVISION 3.6.0
+ENV PROTOBUF_REVISION 3.7.0
 RUN curl -sLO https://github.com/google/protobuf/releases/download/v${PROTOBUF_REVISION}/protoc-${PROTOBUF_REVISION}-linux-x86_64.zip \
   && unzip protoc-${PROTOBUF_REVISION}-linux-x86_64.zip -d ./usr/local \
   && chmod +x /usr/local/bin/protoc \
@@ -48,14 +47,14 @@ RUN ALPINE_GLIBC_BASE_URL="https://github.com/andyshinn/alpine-pkg-glibc/release
         "$ALPINE_GLIBC_I18N_PACKAGE_FILENAME"
 
 ENV JAVA_VERSION=8 \
-    JAVA_UPDATE=181 \
-    JAVA_BUILD=13 \
-    ORACLE_TOKEN=96a7b8442fe848ef90c96a2fad6ed6d1 \
+    JAVA_UPDATE=201 \
+    JAVA_BUILD=09 \
+    ORACLE_TOKEN=42970487e3af4f5aa5bca3f542482c60 \
     JAVA_HOME="/opt/jdk"
 
 RUN apk add --no-cache --virtual=java-dependencies ca-certificates \
     && cd "/tmp" \
-    && curl -sL --header "Cookie: oraclelicense=accept-securebackup-cookie;" -O "http://download.oracle.com/otn-pub/java/jdk/${JAVA_VERSION}u${JAVA_UPDATE}-b${JAVA_BUILD}/${ORACLE_TOKEN}/jdk-${JAVA_VERSION}u${JAVA_UPDATE}-linux-x64.tar.gz" \
+    && curl -sL -b "oraclelicense=accept-securebackup-cookie" -O "http://download.oracle.com/otn-pub/java/jdk/${JAVA_VERSION}u${JAVA_UPDATE}-b${JAVA_BUILD}/${ORACLE_TOKEN}/jdk-${JAVA_VERSION}u${JAVA_UPDATE}-linux-x64.tar.gz" \
     && tar -xzvf "jdk-${JAVA_VERSION}u${JAVA_UPDATE}-linux-x64.tar.gz"  \
     && mkdir -p $JAVA_HOME \
     && mv jdk1*/* $JAVA_HOME \

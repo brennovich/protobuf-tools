@@ -1,0 +1,43 @@
+version: 2
+jobs:
+  build:
+    machine:
+      image: circleci/classic
+
+    steps:
+      - checkout
+
+      - run: make docker-build
+
+  push:
+    machine:
+      image: circleci/classic
+
+    steps:
+      - checkout
+
+      - run:
+          name: docker hub login
+          command: docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+
+      - run:
+          name: build and push image
+          command: make docker-push
+
+workflows:
+  version: 2
+  continuous_integration:
+    jobs:
+      - build:
+          filters:
+            tags:
+              only: /^v[0-9]+\.[0-9]+\.[0-9]{1,3}(-(alpha|beta|rc)?(\.[0-9])?)?$/
+      - push:
+          requires:
+            - build
+          filters:
+            tags:
+              only: /^v[0-9]+\.[0-9]+\.[0-9]{1,3}(-(alpha|beta|rc)?(\.[0-9])?)?$/
+            branches:
+              ignore: /.*/
+
