@@ -12,7 +12,7 @@ RUN apk add --update \
 
 # Build protobuf against configured revision
 #
-ENV PROTOBUF_REVISION 3.7.0
+ENV PROTOBUF_REVISION 3.7.1
 RUN curl -sLO https://github.com/google/protobuf/releases/download/v${PROTOBUF_REVISION}/protoc-${PROTOBUF_REVISION}-linux-x86_64.zip \
   && unzip protoc-${PROTOBUF_REVISION}-linux-x86_64.zip -d ./usr/local \
   && chmod +x /usr/local/bin/protoc \
@@ -46,42 +46,9 @@ RUN ALPINE_GLIBC_BASE_URL="https://github.com/andyshinn/alpine-pkg-glibc/release
         "$ALPINE_GLIBC_BIN_PACKAGE_FILENAME" \
         "$ALPINE_GLIBC_I18N_PACKAGE_FILENAME"
 
-ENV JAVA_VERSION=8 \
-    JAVA_UPDATE=201 \
-    JAVA_BUILD=09 \
-    ORACLE_TOKEN=42970487e3af4f5aa5bca3f542482c60 \
-    JAVA_HOME="/opt/jdk"
-
-RUN apk add --no-cache --virtual=java-dependencies ca-certificates \
-    && cd "/tmp" \
-    && curl -sL -b "oraclelicense=accept-securebackup-cookie" -O "http://download.oracle.com/otn-pub/java/jdk/${JAVA_VERSION}u${JAVA_UPDATE}-b${JAVA_BUILD}/${ORACLE_TOKEN}/jdk-${JAVA_VERSION}u${JAVA_UPDATE}-linux-x64.tar.gz" \
-    && tar -xzvf "jdk-${JAVA_VERSION}u${JAVA_UPDATE}-linux-x64.tar.gz"  \
-    && mkdir -p $JAVA_HOME \
-    && mv jdk1*/* $JAVA_HOME \
-    && ln -s "$JAVA_HOME/bin/"* "/usr/bin/" \
-    && rm -rf "$JAVA_HOME/"*src.zip \
-    && rm -rf $JAVA_HOME/*src.zip \
-      $JAVA_HOME/lib/missioncontrol \
-      $JAVA_HOME/lib/visualvm \
-      $JAVA_HOME/lib/*javafx* \
-      $JAVA_HOME/jre/lib/plugin.jar \
-      $JAVA_HOME/jre/lib/ext/jfxrt.jar \
-      $JAVA_HOME/jre/bin/javaws \
-      $JAVA_HOME/jre/lib/javaws.jar \
-      $JAVA_HOME/jre/lib/desktop \
-      $JAVA_HOME/jre/plugin \
-      $JAVA_HOME/jre/lib/deploy* \
-      $JAVA_HOME/jre/lib/*javafx* \
-      $JAVA_HOME/jre/lib/*jfx* \
-      $JAVA_HOME/jre/lib/amd64/libdecora_sse.so \
-      $JAVA_HOME/jre/lib/amd64/libprism_*.so \
-      $JAVA_HOME/jre/lib/amd64/libfxplugins.so \
-      $JAVA_HOME/jre/lib/amd64/libglass.so \
-      $JAVA_HOME/jre/lib/amd64/libgstreamer-lite.so \
-      $JAVA_HOME/jre/lib/amd64/libjavafx*.so \
-      $JAVA_HOME/jre/lib/amd64/libjfx*.so \
-    && apk del java-dependencies \
-    && rm -rf "/tmp/"*
+RUN apk update
+RUN apk fetch openjdk8
+RUN apk add openjdk8
 
 # Build [protoc-gen-doc](https://github.com/estan/protoc-gen-doc) against configured revision
 #
@@ -99,7 +66,7 @@ RUN curl -sLO https://github.com/pseudomuto/protoc-gen-doc/releases/download/v${
 #
 # Important: Java is a dependency!
 #
-ENV SCALA_PB_VERSION 0.7.4
+ENV SCALA_PB_VERSION 0.8.3
 RUN curl -sLO "https://github.com/trueaccord/ScalaPB/releases/download/v$SCALA_PB_VERSION/scalapbc-$SCALA_PB_VERSION.zip" \
   && unzip "scalapbc-$SCALA_PB_VERSION.zip" \
   && mv "scalapbc-$SCALA_PB_VERSION" /usr/local/lib/scalapbc \
