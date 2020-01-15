@@ -2,7 +2,7 @@ FIXTURES=fixtures/today.proto
 TAG?=$(shell git rev-parse --short HEAD)
 VENDOR=vivareal
 
-protobuf-tools = @docker run --rm -v ${PWD}:/proto-sources:ro -w /proto-sources vivareal/protobuf-tools:$(TAG)
+protobuf-tools = @docker run --rm -v ${PWD}:/proto-sources:ro -w /proto-sources ${VENDOR}/protobuf-tools:$(TAG)
 
 .PHONY: docker-build docker-push test test-go test-java test-scala test-python test-js test-index.html
 
@@ -33,10 +33,10 @@ test-index.html: ${FIXTURES}
 test: docker-build test-go test-java test-scala test-python test-js test-index.html
 
 docker-build:
-	docker build --tag vivareal/protobuf-tools:$(TAG) .
+	docker build --tag ${VENDOR}/protobuf-tools:$(TAG) .
 
 docker-push: docker-build
-	docker tag vivareal/protobuf-tools:$(TAG) ${VENDOR}/protobuf-tools:latest
-	docker tag vivareal/protobuf-tools:$(TAG) ${VENDOR}/protobuf-tools:$(CIRCLE_TAG)
+	docker tag ${VENDOR}/protobuf-tools:$(TAG) ${VENDOR}/protobuf-tools:latest
+	docker tag ${VENDOR}/protobuf-tools:$(TAG) ${VENDOR}/protobuf-tools:$(CIRCLE_TAG)
 	docker push ${VENDOR}/protobuf-tools:$(CIRCLE_TAG)
 	docker push ${VENDOR}/protobuf-tools:latest
