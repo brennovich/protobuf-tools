@@ -12,7 +12,7 @@ RUN apk add --update \
 
 # Build protobuf against configured revision
 #
-ENV PROTOBUF_REVISION 3.7.1
+ENV PROTOBUF_REVISION 3.13.0
 RUN curl -sLO https://github.com/google/protobuf/releases/download/v${PROTOBUF_REVISION}/protoc-${PROTOBUF_REVISION}-linux-x86_64.zip \
   && unzip protoc-${PROTOBUF_REVISION}-linux-x86_64.zip -d ./usr/local \
   && chmod +x /usr/local/bin/protoc \
