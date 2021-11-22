@@ -41,6 +41,7 @@ docker-push: docker-build
 	docker push ${VENDOR}/protobuf-tools
 
 release:
+	git fetch --all
 	RELEASE_MESSAGE=`scripts/release_message.sh` make release/post
 
 release/post:
