@@ -1,0 +1,15 @@
+name: build
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+jobs:
+  build_docker:
+    name: Build Docker image
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - run: make docker-build

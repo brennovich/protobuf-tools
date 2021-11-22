@@ -63,3 +63,9 @@ Check out `[Makefile]` for more tasks ;)
 2. Fix, or add your feature in a new branch
 3. Open up a Pull Request against this repo with a useful description
 4. Try to stick with formatting conventions already used in the files
+
+## Deploying
+
+First, check the latest generated versions [here](https://github.com/olxbr/protobuf-tools/releases).
+
+After your pull request is merged, you can generate a new version by running the `release` workflow dispatch in [GitHub Actions](https://github.com/olxbr/protobuf-tools/actions/workflows/release.yaml) (just click "Run workflow" and fill it with the new version to be released - please use [semantic versioning](https://semver.org/)). That workflow will then generate the given release in GitHub and push a Docker image with the same tag.

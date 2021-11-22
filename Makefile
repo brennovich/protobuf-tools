@@ -36,7 +36,16 @@ docker-build:
 	docker build --tag ${VENDOR}/protobuf-tools:$(TAG) .
 
 docker-push: docker-build
-	docker tag ${VENDOR}/protobuf-tools:$(TAG) ${VENDOR}/protobuf-tools:latest
-	docker tag ${VENDOR}/protobuf-tools:$(TAG) ${VENDOR}/protobuf-tools:$(CIRCLE_TAG)
-	docker push ${VENDOR}/protobuf-tools:$(CIRCLE_TAG)
-	docker push ${VENDOR}/protobuf-tools:latest
+	docker tag ${VENDOR}/protobuf-tools:$(TAG) ${VENDOR}/protobuf-tools
+	docker push ${VENDOR}/protobuf-tools:$(TAG)
+	docker push ${VENDOR}/protobuf-tools
+
+release:
+	RELEASE_MESSAGE=`scripts/release_message.sh` make release/post
+
+release/post:
+	@echo "\nWill create release $(TAG)"
+	@echo "Release changelog will be:\n$(RELEASE_MESSAGE)"
+	curl -sLfS -H "Authorization: token $(GH_TOKEN)" https://api.github.com/repos/olxbr/protobuf-tools/releases \
+		-d '{ "tag_name": "$(TAG)", "target_commitish": "master", "name": "$(TAG)", "body": "$(RELEASE_MESSAGE)", "draft": false, "prerelease": false }' > /dev/null
+	- @echo "Done. You can now check the progress here: https://github.com/olxbr/protobuf-tools/actions"
