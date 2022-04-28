@@ -1,6 +1,5 @@
 FIXTURES=fixtures/today.proto
 TAG?=$(shell git rev-parse --short HEAD)
-VENDOR=vivareal
 
 protobuf-tools = @docker run --rm -v ${PWD}:/proto-sources:ro -w /proto-sources ${VENDOR}/protobuf-tools:$(TAG)
 
@@ -33,12 +32,7 @@ test-index.html: ${FIXTURES}
 test: docker-build test-go test-java test-scala test-python test-js test-index.html
 
 docker-build:
-	docker build --tag ${VENDOR}/protobuf-tools:$(TAG) .
-
-docker-push: docker-build
-	docker tag ${VENDOR}/protobuf-tools:$(TAG) ${VENDOR}/protobuf-tools
-	docker push ${VENDOR}/protobuf-tools:$(TAG)
-	docker push ${VENDOR}/protobuf-tools
+	docker build --tag $(CONTAINER_REGISTRY_HOST)/$(REPOSITORY):$(TAG) .
 
 release:
 	git fetch --all
